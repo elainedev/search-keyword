@@ -6,22 +6,24 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SearchPage = function (_React$Component) {
-	_inherits(SearchPage, _React$Component);
+var SearchApp = function (_React$Component) {
+	_inherits(SearchApp, _React$Component);
 
-	function SearchPage(props) {
-		_classCallCheck(this, SearchPage);
+	function SearchApp(props) {
+		_classCallCheck(this, SearchApp);
 
-		var _this = _possibleConstructorReturn(this, (SearchPage.__proto__ || Object.getPrototypeOf(SearchPage)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (SearchApp.__proto__ || Object.getPrototypeOf(SearchApp)).call(this, props));
 
 		_this.requestJSONData();
 		_this.state = {
-			sentencesHaveLoaded: false
+			sentencesHaveLoaded: false,
+			userInput: ""
 		};
+		_this.handleChange = _this.handleChange.bind(_this);
 		return _this;
 	}
 
-	_createClass(SearchPage, [{
+	_createClass(SearchApp, [{
 		key: 'requestJSONData',
 		value: function requestJSONData() {
 			var _this2 = this;
@@ -42,7 +44,7 @@ var SearchPage = function (_React$Component) {
 				};
 				sentencesRequest.send();
 			}).then(function (data) {
-				console.log('success');
+				console.log("Successfully obtained sentences: ", data);
 				_this2.sentences = data;
 				_this2.setState({ sentencesHaveLoaded: true });
 			}).catch(function (error) {
@@ -50,18 +52,35 @@ var SearchPage = function (_React$Component) {
 			});
 		}
 	}, {
+		key: 'handleChange',
+		value: function handleChange(event) {
+			this.setState({
+				userInput: event.target.value
+			});
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			return React.createElement(
 				'div',
-				{ className: 'page' },
-				this.sentences
+				{ className: 'search-app' },
+				React.createElement(
+					'form',
+					null,
+					React.createElement('input', {
+						className: 'search-bar',
+						type: 'text',
+						value: this.state.userInput,
+						placeholder: "Type your keyword here...",
+						onChange: this.handleChange
+					})
+				)
 			);
 		}
 	}]);
 
-	return SearchPage;
+	return SearchApp;
 }(React.Component);
 
-var domContainer = document.querySelector("#search-page");
-ReactDOM.render(React.createElement(SearchPage, null), domContainer);
+var domContainer = document.querySelector("#search-app");
+ReactDOM.render(React.createElement(SearchApp, null), domContainer);

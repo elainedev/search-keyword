@@ -1,11 +1,13 @@
-class SearchPage extends React.Component {
+class SearchApp extends React.Component {
 	
 	constructor(props) {
 		super(props);
 		this.requestJSONData();
 		this.state = {
 			sentencesHaveLoaded : false,
+			userInput : "",
 		}
+		this.handleChange = this.handleChange.bind(this);
 	}
 
 	requestJSONData() {
@@ -27,7 +29,7 @@ class SearchPage extends React.Component {
 			sentencesRequest.send();
 		})
 		.then(data => {
-			console.log('success');
+			console.log("Successfully obtained sentences: ", data);
 			this.sentences = data;
 			this.setState({ sentencesHaveLoaded : true });
 		})
@@ -36,15 +38,29 @@ class SearchPage extends React.Component {
 		})
 	}
 
+	handleChange(event) {
+		this.setState({
+			userInput : event.target.value
+		})
+	}
+
 	render() {
 		return (
-			<div className="page">
-				{this.sentences}
+			<div className="search-app">
+				<form>
+					<input
+						className="search-bar"
+						type="text"
+						value={this.state.userInput}
+						placeholder={"Type your keyword here..."}
+						onChange={this.handleChange}
+					/>
+				</form>
 			</div>
 		)
 	}
 
 }
 
-const domContainer = document.querySelector("#search-page");
-ReactDOM.render(<SearchPage />, domContainer);
+const domContainer = document.querySelector("#search-app");
+ReactDOM.render(<SearchApp />, domContainer);

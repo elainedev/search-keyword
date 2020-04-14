@@ -1,3 +1,26 @@
-.sample {
-	color: green;
+body {
+	display: flex;
+	justify-content: center;
+	position: relative;
+	height: 100vh;
+}
+
+.search-app {
+	background-color: azure;
+	width: 500px;
+	margin: 70px auto;
+	height: 80%;
+	border: 7px solid blue;
+	padding: 50px;
+}
+
+.search-bar {
+	width: 100%;
+	width: calc(100% - 10px);
+	font-size: 20px;
+	padding: 2px 5px;
+}
+
+::placeholder {
+	font-style: italic;
 }
