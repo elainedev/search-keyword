@@ -12,10 +12,20 @@ class SearchApp extends React.Component {
 		this.handleChange = this.handleChange.bind(this);
 	}
 
+
 	testCase = [
 		{id: "2", data: "app"},
-		{id: "3", data: "ape.﻿"}
+		{id: "3", data: "ape.﻿"},
+		{
+	        "id": "7",
+	        "data": "Subscribe to my channel \ufeff"
+	    },
+	    {
+	        "id": "9",
+	        "data": "Check app \ufeff"
+	    },
 	]
+
 
 	requestJSONData() {
 		new Promise((resolve, reject) => {
@@ -39,12 +49,10 @@ class SearchApp extends React.Component {
 			console.log("Successfully obtained sentences: ", sentences);
 			// this.sentences = sentences;
 			// this.populateTrie(sentences)
-						this.populateTrie(this.testCase)
-
+			this.trie = this.populateTrie(this.testCase)
 			this.setState({ 
 				sentencesLoaded : true,
 				matchingSentenceList : sentences,
-
 			});
 		})
 		.catch(error => {
@@ -56,6 +64,8 @@ class SearchApp extends React.Component {
 		this.setState({
 			userInput : event.target.value
 		})
+		this.matchingSentenceIDs = this.trie.getSentenceIDs(this.state.userInput);
+		console.log(this.matchingSentenceIDs);
 	}
 
 	populateTrie(sentences) {
@@ -65,17 +75,17 @@ class SearchApp extends React.Component {
 			const sentence = sentences[i];
 
 			const words = sentence.data.split(" ");
-console.log('show', sentence.id)
 			for (let j = 0; j < words.length; j++) {
 				trie.insertLetter(words[j], sentence.id);
 			}
 		}
 		console.log('gah', trie);
+		return trie;
 	}
 
 	render() {
 		// console.log('render sentences', this.sentences)
-		console.log('render display', this.state.matchingSentenceList)
+		// console.log('render display', this.state.matchingSentenceList)
 		return (
 			<div className="search-app">
 				<form>
@@ -121,10 +131,10 @@ class Trie {
 			if (!node.children[char]) {
 				node.children[char] = new TrieNode(char);
 				node.children[char].parent = node;
-				node.children[char].sentenceIDs.add(sentenceID);
 			}
-
+			
 			node = node.children[char];
+			node.sentenceIDs.add(sentenceID);
 		}
 	}
 
@@ -136,11 +146,10 @@ class Trie {
 				node = node.children[prefix[i]];
 			}
 			else {
-				return node.sentenceIDs;
+				return null;
 			}
 		}
-
-		return null;
+		return node.sentenceIDs;
 	}
 
 

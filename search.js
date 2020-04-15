@@ -14,7 +14,13 @@ var SearchApp = function (_React$Component) {
 
 		var _this = _possibleConstructorReturn(this, (SearchApp.__proto__ || Object.getPrototypeOf(SearchApp)).call(this, props));
 
-		_this.testCase = [{ id: "2", data: "app" }, { id: "3", data: "ape.﻿" }];
+		_this.testCase = [{ id: "2", data: "app" }, { id: "3", data: "ape.﻿" }, {
+			"id": "7",
+			"data": "Subscribe to my channel \uFEFF"
+		}, {
+			"id": "9",
+			"data": "Check app \uFEFF"
+		}];
 
 		_this.requestJSONData();
 		_this.state = {
@@ -51,12 +57,10 @@ var SearchApp = function (_React$Component) {
 				console.log("Successfully obtained sentences: ", sentences);
 				// this.sentences = sentences;
 				// this.populateTrie(sentences)
-				_this2.populateTrie(_this2.testCase);
-
+				_this2.trie = _this2.populateTrie(_this2.testCase);
 				_this2.setState({
 					sentencesLoaded: true,
 					matchingSentenceList: sentences
-
 				});
 			}).catch(function (error) {
 				console.log(error);
@@ -68,6 +72,8 @@ var SearchApp = function (_React$Component) {
 			this.setState({
 				userInput: event.target.value
 			});
+			this.matchingSentenceIDs = this.trie.getSentenceIDs(this.state.userInput);
+			console.log(this.matchingSentenceIDs);
 		}
 	}, {
 		key: "populateTrie",
@@ -78,18 +84,18 @@ var SearchApp = function (_React$Component) {
 				var sentence = sentences[i];
 
 				var words = sentence.data.split(" ");
-				console.log('show', sentence.id);
 				for (var j = 0; j < words.length; j++) {
 					trie.insertLetter(words[j], sentence.id);
 				}
 			}
 			console.log('gah', trie);
+			return trie;
 		}
 	}, {
 		key: "render",
 		value: function render() {
 			// console.log('render sentences', this.sentences)
-			console.log('render display', this.state.matchingSentenceList);
+			// console.log('render display', this.state.matchingSentenceList)
 			return React.createElement(
 				"div",
 				{ className: "search-app" },
@@ -148,10 +154,10 @@ var Trie = function () {
 				if (!node.children[char]) {
 					node.children[char] = new TrieNode(char);
 					node.children[char].parent = node;
-					node.children[char].sentenceIDs.add(sentenceID);
 				}
 
 				node = node.children[char];
+				node.sentenceIDs.add(sentenceID);
 			}
 		}
 	}, {
@@ -163,11 +169,10 @@ var Trie = function () {
 				if (node.children[prefix[i]]) {
 					node = node.children[prefix[i]];
 				} else {
-					return node.sentenceIDs;
+					return null;
 				}
 			}
-
-			return null;
+			return node.sentenceIDs;
 		}
 	}, {
 		key: "isLetter",
