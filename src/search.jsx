@@ -13,21 +13,6 @@ class SearchApp extends React.Component {
 		this.handleChange = this.handleChange.bind(this);
 	}
 
-
-	testCase = [
-		{id: "2", data: "app"},
-		{id: "3", data: "ape.﻿"},
-		{
-	        "id": "7",
-	        "data": "Subscribe to my channel \ufeff"
-	    },
-	    {
-	        "id": "9",
-	        "data": "Check app \ufeff"
-	    },
-	]
-
-
 	requestJSONData() {
 		new Promise((resolve, reject) => {
 			const sentencesRequest = new XMLHttpRequest();
@@ -50,7 +35,6 @@ class SearchApp extends React.Component {
 			console.log("Successfully obtained sentences: ", sentences);
 			this.sentences = sentences;
 			this.trie = this.populateTrie(sentences)
-			// this.trie = this.populateTrie(this.testCase)
 			this.setState({ 
 				sentencesLoaded : true,
 				matchingSentenceList : sentences,
@@ -78,15 +62,15 @@ class SearchApp extends React.Component {
 	}
 
 	updateSentenceList() {
-		console.log('matchingIDs', this.state.matchingIDs, this.state.userInput)
+		console.log('matchingIDs', this.state.matchingIDs)
 
 		if (! this.state.userInput) {
 			this.setState({matchingSentenceList : this.sentences})
 		}
-		else if (this.state.matchingIDs.size) {
+		else if (this.state.matchingIDs) {
 			this.setState({matchingSentenceList : this.sentences.filter(sentence => this.state.matchingIDs.has(sentence.id))})
 		}
-		else if (this.state.matchingIDs.size === 0) {
+		else {
 			this.setState({matchingSentenceList : []})
 		}
 	}
@@ -106,25 +90,39 @@ class SearchApp extends React.Component {
 	}
 
 	render() {
-		// console.log('render sentences', this.sentences)
-		// console.log('render display', this.state.matchingSentenceList)
-		const matchingSentenceList = this.state.matchingSentenceList;
+		const {matchingSentenceList, userInput} = this.state;
 
 		return (
-			<div className="search-app">
-				<form>
-					<input
-						className="search-bar"
-						type="text"
-						value={this.state.userInput}
-						placeholder={"Type your keyword here..."}
-						onChange={this.handleChange}
-					/>
-				</form>
-				{matchingSentenceList.map(sentence => 
-					<div key={sentence.id} className="sentence-block">{sentence.data}</div>
-				)}
-				{matchingSentenceList.length === 0 ? <div className="no-matches">no matches</div> : null}
+			<div>
+				<div className="search-app">
+					<form>
+						<input
+							className="search-bar"
+							type="text"
+							value={this.state.userInput}
+							placeholder="Type your search word here..."
+							onChange={this.handleChange}
+						/>
+					</form>
+					{matchingSentenceList.map(sentence => 
+						<div key={sentence.id} className="sentence-block">{sentence.data}</div>
+					)}
+					{userInput && matchingSentenceList.length === 0 ? <div className="no-matches">no matches</div> : null}
+					
+				</div>
+				<div className="comments">
+					Comments Regarding My Implementation
+					<ul>
+						<li>If the search bar is blank (i.e. the user has not typed in any input), all sentences are displayed in the app.</li>
+						<li>Once the user types in input, only sentences that contain words that match the input are displayed.</li>
+						<li>If the input contains letter combinations that are not found in the sentences, the text "no matches" will display on the app.</li>
+						<li>Special characters such as punctuation and "/" are ignored.</li>
+						<li>The input is case insensitive.</li>
+					</ul>
+					<div style={{textAlign: "right"}}>Thanks,<br/>
+					Elaine Wang
+					</div>
+				</div>
 			</div>
 		)
 	}
@@ -171,10 +169,9 @@ class Trie {
 				node = node.children[prefix[i]];
 			}
 			else {
-				return new Set();
+				return null;
 			}
 		}
-		console.log('prefix', prefix)
 		return node.sentenceIDs;
 	}
 

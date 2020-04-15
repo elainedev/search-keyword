@@ -8,8 +8,8 @@ body {
 .search-app {
 	background-color: #DAE2ED;
 	width: 500px;
-	margin: 70px auto;
-	height: 70%;
+	margin: 50px auto 25px;
+	height: 70vh;
 	border: 7px solid #4B74B8;
 	border-radius: 3px;
 	padding: 50px;

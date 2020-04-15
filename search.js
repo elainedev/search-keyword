@@ -14,14 +14,6 @@ var SearchApp = function (_React$Component) {
 
 		var _this = _possibleConstructorReturn(this, (SearchApp.__proto__ || Object.getPrototypeOf(SearchApp)).call(this, props));
 
-		_this.testCase = [{ id: "2", data: "app" }, { id: "3", data: "ape.﻿" }, {
-			"id": "7",
-			"data": "Subscribe to my channel \uFEFF"
-		}, {
-			"id": "9",
-			"data": "Check app \uFEFF"
-		}];
-
 		_this.requestJSONData();
 		_this.state = {
 			sentencesLoaded: false,
@@ -35,7 +27,7 @@ var SearchApp = function (_React$Component) {
 	}
 
 	_createClass(SearchApp, [{
-		key: "requestJSONData",
+		key: 'requestJSONData',
 		value: function requestJSONData() {
 			var _this2 = this;
 
@@ -58,7 +50,6 @@ var SearchApp = function (_React$Component) {
 				console.log("Successfully obtained sentences: ", sentences);
 				_this2.sentences = sentences;
 				_this2.trie = _this2.populateTrie(sentences);
-				// this.trie = this.populateTrie(this.testCase)
 				_this2.setState({
 					sentencesLoaded: true,
 					matchingSentenceList: sentences
@@ -68,38 +59,38 @@ var SearchApp = function (_React$Component) {
 			});
 		}
 	}, {
-		key: "handleChange",
+		key: 'handleChange',
 		value: function handleChange(event) {
 			this.setState({
 				userInput: event.target.value
 			}, this.updateSentenceIDs);
 		}
 	}, {
-		key: "updateSentenceIDs",
+		key: 'updateSentenceIDs',
 		value: function updateSentenceIDs() {
 			this.setState({
 				matchingIDs: this.trie.getSentenceIDs(this.state.userInput)
 			}, this.updateSentenceList);
 		}
 	}, {
-		key: "updateSentenceList",
+		key: 'updateSentenceList',
 		value: function updateSentenceList() {
 			var _this3 = this;
 
-			console.log('matchingIDs', this.state.matchingIDs, this.state.userInput);
+			console.log('matchingIDs', this.state.matchingIDs);
 
 			if (!this.state.userInput) {
 				this.setState({ matchingSentenceList: this.sentences });
-			} else if (this.state.matchingIDs.size) {
+			} else if (this.state.matchingIDs) {
 				this.setState({ matchingSentenceList: this.sentences.filter(function (sentence) {
 						return _this3.state.matchingIDs.has(sentence.id);
 					}) });
-			} else if (this.state.matchingIDs.size === 0) {
+			} else {
 				this.setState({ matchingSentenceList: [] });
 			}
 		}
 	}, {
-		key: "populateTrie",
+		key: 'populateTrie',
 		value: function populateTrie(sentences) {
 			var trie = new Trie();
 
@@ -114,38 +105,84 @@ var SearchApp = function (_React$Component) {
 			return trie;
 		}
 	}, {
-		key: "render",
+		key: 'render',
 		value: function render() {
-			// console.log('render sentences', this.sentences)
-			// console.log('render display', this.state.matchingSentenceList)
-			var matchingSentenceList = this.state.matchingSentenceList;
+			var _state = this.state,
+			    matchingSentenceList = _state.matchingSentenceList,
+			    userInput = _state.userInput;
+
 
 			return React.createElement(
-				"div",
-				{ className: "search-app" },
+				'div',
+				null,
 				React.createElement(
-					"form",
-					null,
-					React.createElement("input", {
-						className: "search-bar",
-						type: "text",
-						value: this.state.userInput,
-						placeholder: "Type your keyword here...",
-						onChange: this.handleChange
-					})
+					'div',
+					{ className: 'search-app' },
+					React.createElement(
+						'form',
+						null,
+						React.createElement('input', {
+							className: 'search-bar',
+							type: 'text',
+							value: this.state.userInput,
+							placeholder: 'Type your search word here...',
+							onChange: this.handleChange
+						})
+					),
+					matchingSentenceList.map(function (sentence) {
+						return React.createElement(
+							'div',
+							{ key: sentence.id, className: 'sentence-block' },
+							sentence.data
+						);
+					}),
+					userInput && matchingSentenceList.length === 0 ? React.createElement(
+						'div',
+						{ className: 'no-matches' },
+						'no matches'
+					) : null
 				),
-				matchingSentenceList.map(function (sentence) {
-					return React.createElement(
-						"div",
-						{ key: sentence.id, className: "sentence-block" },
-						sentence.data
-					);
-				}),
-				matchingSentenceList.length === 0 ? React.createElement(
-					"div",
-					{ className: "no-matches" },
-					"no matches"
-				) : null
+				React.createElement(
+					'div',
+					{ className: 'comments' },
+					'Comments Regarding My Implementation',
+					React.createElement(
+						'ul',
+						null,
+						React.createElement(
+							'li',
+							null,
+							'If the search bar is blank (i.e. the user has not typed in any input), all sentences are displayed in the app.'
+						),
+						React.createElement(
+							'li',
+							null,
+							'Once the user types in input, only sentences that contain words that match the input are displayed.'
+						),
+						React.createElement(
+							'li',
+							null,
+							'If the input contains letter combinations that are not found in the sentences, the text "no matches" will display on the app.'
+						),
+						React.createElement(
+							'li',
+							null,
+							'Special characters such as punctuation and "/" are ignored.'
+						),
+						React.createElement(
+							'li',
+							null,
+							'The input is case insensitive.'
+						)
+					),
+					React.createElement(
+						'div',
+						{ style: { textAlign: "right" } },
+						'Thanks,',
+						React.createElement('br', null),
+						'Elaine Wang'
+					)
+				)
 			);
 		}
 	}]);
@@ -170,7 +207,7 @@ var Trie = function () {
 	}
 
 	_createClass(Trie, [{
-		key: "insertLetter",
+		key: 'insertLetter',
 		value: function insertLetter(word, sentenceID) {
 			var node = this.root;
 
@@ -190,7 +227,7 @@ var Trie = function () {
 			}
 		}
 	}, {
-		key: "getSentenceIDs",
+		key: 'getSentenceIDs',
 		value: function getSentenceIDs(prefix) {
 			var node = this.root;
 
@@ -198,14 +235,13 @@ var Trie = function () {
 				if (node.children[prefix[i]]) {
 					node = node.children[prefix[i]];
 				} else {
-					return new Set();
+					return null;
 				}
 			}
-			console.log('prefix', prefix);
 			return node.sentenceIDs;
 		}
 	}, {
-		key: "isLetter",
+		key: 'isLetter',
 		value: function isLetter(character) {
 			return 'abcdefghijklmnopqrstuvwxyz'.indexOf(character) > -1;
 		}
