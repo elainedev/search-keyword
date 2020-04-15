@@ -164,6 +164,8 @@ class Trie {
 	getSentenceIDs(prefix) {
 		let node = this.root;
 
+		prefix = prefix.toLowerCase();
+
 		for (let i = 0; i < prefix.length; i++) {
 			if (node.children[prefix[i]]) {
 				node = node.children[prefix[i]];

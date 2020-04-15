@@ -231,6 +231,8 @@ var Trie = function () {
 		value: function getSentenceIDs(prefix) {
 			var node = this.root;
 
+			prefix = prefix.toLowerCase();
+
 			for (var i = 0; i < prefix.length; i++) {
 				if (node.children[prefix[i]]) {
 					node = node.children[prefix[i]];
