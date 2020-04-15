@@ -56,8 +56,8 @@ var SearchApp = function (_React$Component) {
 			}).then(function (sentences) {
 				console.log("Successfully obtained sentences: ", sentences);
 				// this.sentences = sentences;
-				// this.populateTrie(sentences)
-				_this2.trie = _this2.populateTrie(_this2.testCase);
+				_this2.populateTrie(sentences);
+				// this.trie = this.populateTrie(this.testCase)
 				_this2.setState({
 					sentencesLoaded: true,
 					matchingSentenceList: sentences
@@ -71,9 +71,21 @@ var SearchApp = function (_React$Component) {
 		value: function handleChange(event) {
 			this.setState({
 				userInput: event.target.value
-			});
-			this.matchingSentenceIDs = this.trie.getSentenceIDs(this.state.userInput);
-			console.log(this.matchingSentenceIDs);
+			}, this.getIDs);
+			console.log('matchingIDs', this.matchingIDs);
+
+			// const newList = this.state.matchingSentenceList.filter(sentence => this.matchingIDs.has(sentence.id));
+			// console.log('wh')
+			// console.log(newList)
+			// this.setState({
+			// 	matchingSentenceList : newList,
+			// })
+		}
+	}, {
+		key: "getIDs",
+		value: function getIDs() {
+			this.matchingIDs = this.trie.getSentenceIDs(this.state.userInput);
+			// console.log('matchingIDs', this.matchingIDs)
 		}
 	}, {
 		key: "populateTrie",
