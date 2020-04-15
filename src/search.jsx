@@ -48,7 +48,7 @@ class SearchApp extends React.Component {
 		})
 		.then(sentences => {
 			console.log("Successfully obtained sentences: ", sentences);
-			// this.sentences = sentences;
+			this.sentences = sentences;
 			this.trie = this.populateTrie(sentences)
 			// this.trie = this.populateTrie(this.testCase)
 			this.setState({ 
@@ -65,36 +65,30 @@ class SearchApp extends React.Component {
 		this.setState({
 			userInput : event.target.value
 		}, 
-		this.updateIDs
+		this.updateSentenceIDs
 		)
-		// const newList = this.state.matchingSentenceList.filter(sentence => this.matchingIDs.has(sentence.id));
-		// console.log('wh')
-		// console.log(newList)
-		// this.setState({
-		// 	matchingSentenceList : newList,
-		// })
 	}
 
-	updateIDs() {
+	updateSentenceIDs() {
 		this.setState({
 			matchingIDs : this.trie.getSentenceIDs(this.state.userInput),
 		},
 		this.updateSentenceList
 		)
-		// let matchingIDs = this.trie.getSentenceIDs(this.state.userInput);
-		// let newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(sentence => this.state.matchingIDs.has(sentence.id)) : [];
-		// this.setState({
-		// 	matchingSentenceList : newSentenceList
-		// })
 	}
 
 	updateSentenceList() {
-		console.log('m', this.state.matchingIDs)
+		console.log('matchingIDs', this.state.matchingIDs, this.state.userInput)
 
-		let newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(sentence => this.state.matchingIDs.has(sentence.id)) : [];
-		this.setState({
-			matchingSentenceList : newSentenceList
-		})
+		if (! this.state.userInput) {
+			this.setState({matchingSentenceList : this.sentences})
+		}
+		else if (this.state.matchingIDs.size) {
+			this.setState({matchingSentenceList : this.sentences.filter(sentence => this.state.matchingIDs.has(sentence.id))})
+		}
+		else if (this.state.matchingIDs.size === 0) {
+			this.setState({matchingSentenceList : []})
+		}
 	}
 
 	populateTrie(sentences) {
@@ -108,13 +102,14 @@ class SearchApp extends React.Component {
 				trie.insertLetter(words[j], sentence.id);
 			}
 		}
-		console.log('gah', trie);
 		return trie;
 	}
 
 	render() {
 		// console.log('render sentences', this.sentences)
 		// console.log('render display', this.state.matchingSentenceList)
+		const matchingSentenceList = this.state.matchingSentenceList;
+
 		return (
 			<div className="search-app">
 				<form>
@@ -126,9 +121,10 @@ class SearchApp extends React.Component {
 						onChange={this.handleChange}
 					/>
 				</form>
-				{this.state.matchingSentenceList.map(sentence => 
+				{matchingSentenceList.map(sentence => 
 					<div key={sentence.id} className="sentence-block">{sentence.data}</div>
 				)}
+				{matchingSentenceList.length === 0 ? <div className="no-matches">no matches</div> : null}
 			</div>
 		)
 	}
@@ -178,7 +174,7 @@ class Trie {
 				return new Set();
 			}
 		}
-		console.log(prefix)
+		console.log('prefix', prefix)
 		return node.sentenceIDs;
 	}
 

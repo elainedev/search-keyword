@@ -56,7 +56,7 @@ var SearchApp = function (_React$Component) {
 				sentencesRequest.send();
 			}).then(function (sentences) {
 				console.log("Successfully obtained sentences: ", sentences);
-				// this.sentences = sentences;
+				_this2.sentences = sentences;
 				_this2.trie = _this2.populateTrie(sentences);
 				// this.trie = this.populateTrie(this.testCase)
 				_this2.setState({
@@ -72,39 +72,31 @@ var SearchApp = function (_React$Component) {
 		value: function handleChange(event) {
 			this.setState({
 				userInput: event.target.value
-			}, this.updateIDs);
-			// const newList = this.state.matchingSentenceList.filter(sentence => this.matchingIDs.has(sentence.id));
-			// console.log('wh')
-			// console.log(newList)
-			// this.setState({
-			// 	matchingSentenceList : newList,
-			// })
+			}, this.updateSentenceIDs);
 		}
 	}, {
-		key: "updateIDs",
-		value: function updateIDs() {
+		key: "updateSentenceIDs",
+		value: function updateSentenceIDs() {
 			this.setState({
 				matchingIDs: this.trie.getSentenceIDs(this.state.userInput)
 			}, this.updateSentenceList);
-			// let matchingIDs = this.trie.getSentenceIDs(this.state.userInput);
-			// let newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(sentence => this.state.matchingIDs.has(sentence.id)) : [];
-			// this.setState({
-			// 	matchingSentenceList : newSentenceList
-			// })
 		}
 	}, {
 		key: "updateSentenceList",
 		value: function updateSentenceList() {
 			var _this3 = this;
 
-			console.log('m', this.state.matchingIDs);
+			console.log('matchingIDs', this.state.matchingIDs, this.state.userInput);
 
-			var newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(function (sentence) {
-				return _this3.state.matchingIDs.has(sentence.id);
-			}) : [];
-			this.setState({
-				matchingSentenceList: newSentenceList
-			});
+			if (!this.state.userInput) {
+				this.setState({ matchingSentenceList: this.sentences });
+			} else if (this.state.matchingIDs.size) {
+				this.setState({ matchingSentenceList: this.sentences.filter(function (sentence) {
+						return _this3.state.matchingIDs.has(sentence.id);
+					}) });
+			} else if (this.state.matchingIDs.size === 0) {
+				this.setState({ matchingSentenceList: [] });
+			}
 		}
 	}, {
 		key: "populateTrie",
@@ -119,7 +111,6 @@ var SearchApp = function (_React$Component) {
 					trie.insertLetter(words[j], sentence.id);
 				}
 			}
-			console.log('gah', trie);
 			return trie;
 		}
 	}, {
@@ -127,6 +118,8 @@ var SearchApp = function (_React$Component) {
 		value: function render() {
 			// console.log('render sentences', this.sentences)
 			// console.log('render display', this.state.matchingSentenceList)
+			var matchingSentenceList = this.state.matchingSentenceList;
+
 			return React.createElement(
 				"div",
 				{ className: "search-app" },
@@ -141,13 +134,18 @@ var SearchApp = function (_React$Component) {
 						onChange: this.handleChange
 					})
 				),
-				this.state.matchingSentenceList.map(function (sentence) {
+				matchingSentenceList.map(function (sentence) {
 					return React.createElement(
 						"div",
 						{ key: sentence.id, className: "sentence-block" },
 						sentence.data
 					);
-				})
+				}),
+				matchingSentenceList.length === 0 ? React.createElement(
+					"div",
+					{ className: "no-matches" },
+					"no matches"
+				) : null
 			);
 		}
 	}]);
@@ -203,7 +201,7 @@ var Trie = function () {
 					return new Set();
 				}
 			}
-			console.log(prefix);
+			console.log('prefix', prefix);
 			return node.sentenceIDs;
 		}
 	}, {
