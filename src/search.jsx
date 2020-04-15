@@ -5,6 +5,7 @@ class SearchApp extends React.Component {
 		this.requestJSONData();
 		this.state = {
 			sentencesLoaded : false,
+			matchingIDs : [],
 			matchingSentenceList : [],
 			userInput : "",
 		}
@@ -48,7 +49,7 @@ class SearchApp extends React.Component {
 		.then(sentences => {
 			console.log("Successfully obtained sentences: ", sentences);
 			// this.sentences = sentences;
-			this.populateTrie(sentences)
+			this.trie = this.populateTrie(sentences)
 			// this.trie = this.populateTrie(this.testCase)
 			this.setState({ 
 				sentencesLoaded : true,
@@ -64,10 +65,8 @@ class SearchApp extends React.Component {
 		this.setState({
 			userInput : event.target.value
 		}, 
-		this.getIDs
+		this.updateIDs
 		)
-				console.log('matchingIDs', this.matchingIDs)
-
 		// const newList = this.state.matchingSentenceList.filter(sentence => this.matchingIDs.has(sentence.id));
 		// console.log('wh')
 		// console.log(newList)
@@ -76,9 +75,26 @@ class SearchApp extends React.Component {
 		// })
 	}
 
-	getIDs() {
-		this.matchingIDs = this.trie.getSentenceIDs(this.state.userInput)
-		// console.log('matchingIDs', this.matchingIDs)
+	updateIDs() {
+		this.setState({
+			matchingIDs : this.trie.getSentenceIDs(this.state.userInput),
+		},
+		this.updateSentenceList
+		)
+		// let matchingIDs = this.trie.getSentenceIDs(this.state.userInput);
+		// let newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(sentence => this.state.matchingIDs.has(sentence.id)) : [];
+		// this.setState({
+		// 	matchingSentenceList : newSentenceList
+		// })
+	}
+
+	updateSentenceList() {
+		console.log('m', this.state.matchingIDs)
+
+		let newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(sentence => this.state.matchingIDs.has(sentence.id)) : [];
+		this.setState({
+			matchingSentenceList : newSentenceList
+		})
 	}
 
 	populateTrie(sentences) {
@@ -159,9 +175,10 @@ class Trie {
 				node = node.children[prefix[i]];
 			}
 			else {
-				return null;
+				return new Set();
 			}
 		}
+		console.log(prefix)
 		return node.sentenceIDs;
 	}
 

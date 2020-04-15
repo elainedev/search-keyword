@@ -25,6 +25,7 @@ var SearchApp = function (_React$Component) {
 		_this.requestJSONData();
 		_this.state = {
 			sentencesLoaded: false,
+			matchingIDs: [],
 			matchingSentenceList: [],
 			userInput: ""
 		};
@@ -56,7 +57,7 @@ var SearchApp = function (_React$Component) {
 			}).then(function (sentences) {
 				console.log("Successfully obtained sentences: ", sentences);
 				// this.sentences = sentences;
-				_this2.populateTrie(sentences);
+				_this2.trie = _this2.populateTrie(sentences);
 				// this.trie = this.populateTrie(this.testCase)
 				_this2.setState({
 					sentencesLoaded: true,
@@ -71,9 +72,7 @@ var SearchApp = function (_React$Component) {
 		value: function handleChange(event) {
 			this.setState({
 				userInput: event.target.value
-			}, this.getIDs);
-			console.log('matchingIDs', this.matchingIDs);
-
+			}, this.updateIDs);
 			// const newList = this.state.matchingSentenceList.filter(sentence => this.matchingIDs.has(sentence.id));
 			// console.log('wh')
 			// console.log(newList)
@@ -82,10 +81,30 @@ var SearchApp = function (_React$Component) {
 			// })
 		}
 	}, {
-		key: "getIDs",
-		value: function getIDs() {
-			this.matchingIDs = this.trie.getSentenceIDs(this.state.userInput);
-			// console.log('matchingIDs', this.matchingIDs)
+		key: "updateIDs",
+		value: function updateIDs() {
+			this.setState({
+				matchingIDs: this.trie.getSentenceIDs(this.state.userInput)
+			}, this.updateSentenceList);
+			// let matchingIDs = this.trie.getSentenceIDs(this.state.userInput);
+			// let newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(sentence => this.state.matchingIDs.has(sentence.id)) : [];
+			// this.setState({
+			// 	matchingSentenceList : newSentenceList
+			// })
+		}
+	}, {
+		key: "updateSentenceList",
+		value: function updateSentenceList() {
+			var _this3 = this;
+
+			console.log('m', this.state.matchingIDs);
+
+			var newSentenceList = this.state.matchingIDs.size ? this.state.matchingSentenceList.filter(function (sentence) {
+				return _this3.state.matchingIDs.has(sentence.id);
+			}) : [];
+			this.setState({
+				matchingSentenceList: newSentenceList
+			});
 		}
 	}, {
 		key: "populateTrie",
@@ -181,9 +200,10 @@ var Trie = function () {
 				if (node.children[prefix[i]]) {
 					node = node.children[prefix[i]];
 				} else {
-					return null;
+					return new Set();
 				}
 			}
+			console.log(prefix);
 			return node.sentenceIDs;
 		}
 	}, {
