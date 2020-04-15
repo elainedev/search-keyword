@@ -14,18 +14,21 @@ var SearchApp = function (_React$Component) {
 
 		var _this = _possibleConstructorReturn(this, (SearchApp.__proto__ || Object.getPrototypeOf(SearchApp)).call(this, props));
 
+		_this.testCase = [{ id: "2", data: "app" }, { id: "3", data: "ape.﻿" }];
+
 		_this.requestJSONData();
 		_this.state = {
 			sentencesLoaded: false,
-			sentenceList: [],
+			matchingSentenceList: [],
 			userInput: ""
 		};
+
 		_this.handleChange = _this.handleChange.bind(_this);
 		return _this;
 	}
 
 	_createClass(SearchApp, [{
-		key: 'requestJSONData',
+		key: "requestJSONData",
 		value: function requestJSONData() {
 			var _this2 = this;
 
@@ -44,12 +47,15 @@ var SearchApp = function (_React$Component) {
 					}
 				};
 				sentencesRequest.send();
-			}).then(function (data) {
-				console.log("Successfully obtained sentences: ", data);
-				_this2.sentences = data;
+			}).then(function (sentences) {
+				console.log("Successfully obtained sentences: ", sentences);
+				// this.sentences = sentences;
+				// this.populateTrie(sentences)
+				_this2.populateTrie(_this2.testCase);
+
 				_this2.setState({
 					sentencesLoaded: true,
-					sentenceList: _this2.sentences
+					matchingSentenceList: sentences
 
 				});
 			}).catch(function (error) {
@@ -57,35 +63,51 @@ var SearchApp = function (_React$Component) {
 			});
 		}
 	}, {
-		key: 'handleChange',
+		key: "handleChange",
 		value: function handleChange(event) {
 			this.setState({
 				userInput: event.target.value
 			});
 		}
 	}, {
-		key: 'render',
+		key: "populateTrie",
+		value: function populateTrie(sentences) {
+			var trie = new Trie();
+
+			for (var i = 0; i < sentences.length; i++) {
+				var sentence = sentences[i];
+
+				var words = sentence.data.split(" ");
+				console.log('show', sentence.id);
+				for (var j = 0; j < words.length; j++) {
+					trie.insertLetter(words[j], sentence.id);
+				}
+			}
+			console.log('gah', trie);
+		}
+	}, {
+		key: "render",
 		value: function render() {
-			console.log('render sentences', this.sentences);
-			console.log('render display', this.state.sentenceList);
+			// console.log('render sentences', this.sentences)
+			console.log('render display', this.state.matchingSentenceList);
 			return React.createElement(
-				'div',
-				{ className: 'search-app' },
+				"div",
+				{ className: "search-app" },
 				React.createElement(
-					'form',
+					"form",
 					null,
-					React.createElement('input', {
-						className: 'search-bar',
-						type: 'text',
+					React.createElement("input", {
+						className: "search-bar",
+						type: "text",
 						value: this.state.userInput,
 						placeholder: "Type your keyword here...",
 						onChange: this.handleChange
 					})
 				),
-				this.state.sentenceList.map(function (sentence) {
+				this.state.matchingSentenceList.map(function (sentence) {
 					return React.createElement(
-						'div',
-						{ key: sentence.id, className: 'sentence-block' },
+						"div",
+						{ key: sentence.id, className: "sentence-block" },
 						sentence.data
 					);
 				})
@@ -95,6 +117,67 @@ var SearchApp = function (_React$Component) {
 
 	return SearchApp;
 }(React.Component);
+
+var TrieNode = function TrieNode(char) {
+	_classCallCheck(this, TrieNode);
+
+	this.char = char;
+	this.parent = null;
+	this.children = {};
+	this.sentenceIDs = new Set();
+};
+
+var Trie = function () {
+	function Trie() {
+		_classCallCheck(this, Trie);
+
+		this.root = new TrieNode(null);
+	}
+
+	_createClass(Trie, [{
+		key: "insertLetter",
+		value: function insertLetter(word, sentenceID) {
+			var node = this.root;
+
+			for (var i = 0; i < word.length; i++) {
+				var char = word[i].toLowerCase();
+
+				if (char === '\\') break;
+				if (!this.isLetter(char)) continue;
+
+				if (!node.children[char]) {
+					node.children[char] = new TrieNode(char);
+					node.children[char].parent = node;
+					node.children[char].sentenceIDs.add(sentenceID);
+				}
+
+				node = node.children[char];
+			}
+		}
+	}, {
+		key: "getSentenceIDs",
+		value: function getSentenceIDs(prefix) {
+			var node = this.root;
+
+			for (var i = 0; i < prefix.length; i++) {
+				if (node.children[prefix[i]]) {
+					node = node.children[prefix[i]];
+				} else {
+					return node.sentenceIDs;
+				}
+			}
+
+			return null;
+		}
+	}, {
+		key: "isLetter",
+		value: function isLetter(character) {
+			return 'abcdefghijklmnopqrstuvwxyz'.indexOf(character) > -1;
+		}
+	}]);
+
+	return Trie;
+}();
 
 var domContainer = document.querySelector("#search-app");
 ReactDOM.render(React.createElement(SearchApp, null), domContainer);
