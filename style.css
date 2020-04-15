@@ -6,12 +6,14 @@ body {
 }
 
 .search-app {
-	background-color: azure;
+	background-color: #DAE2ED;
 	width: 500px;
 	margin: 70px auto;
 	height: 80%;
-	border: 7px solid blue;
+	border: 7px solid #4B74B8;
+	border-radius: 3px;
 	padding: 50px;
+	overflow: scroll;
 }
 
 .search-bar {
@@ -19,8 +21,18 @@ body {
 	width: calc(100% - 10px);
 	font-size: 20px;
 	padding: 2px 5px;
+	margin-bottom: 15px;
 }
 
 ::placeholder {
 	font-style: italic;
+}
+
+.sentence-block {
+	background-color: #375591;
+	margin: 12px;
+	color: white;
+	font-family: sans-serif;
+	padding: 5px 8px;
+	border-radius: 5px;
 }

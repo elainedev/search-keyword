@@ -4,7 +4,8 @@ class SearchApp extends React.Component {
 		super(props);
 		this.requestJSONData();
 		this.state = {
-			sentencesHaveLoaded : false,
+			sentencesLoaded : false,
+			sentenceList : [],
 			userInput : "",
 		}
 		this.handleChange = this.handleChange.bind(this);
@@ -31,7 +32,11 @@ class SearchApp extends React.Component {
 		.then(data => {
 			console.log("Successfully obtained sentences: ", data);
 			this.sentences = data;
-			this.setState({ sentencesHaveLoaded : true });
+			this.setState({ 
+				sentencesLoaded : true,
+				sentenceList : this.sentences,
+
+			});
 		})
 		.catch(error => {
 			console.log(error);
@@ -45,6 +50,8 @@ class SearchApp extends React.Component {
 	}
 
 	render() {
+		console.log('render sentences', this.sentences)
+		console.log('render display', this.state.sentenceList)
 		return (
 			<div className="search-app">
 				<form>
@@ -56,6 +63,9 @@ class SearchApp extends React.Component {
 						onChange={this.handleChange}
 					/>
 				</form>
+				{this.state.sentenceList.map(sentence => 
+					<div key={sentence.id} className="sentence-block">{sentence.data}</div>
+				)}
 			</div>
 		)
 	}

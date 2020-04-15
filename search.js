@@ -16,7 +16,8 @@ var SearchApp = function (_React$Component) {
 
 		_this.requestJSONData();
 		_this.state = {
-			sentencesHaveLoaded: false,
+			sentencesLoaded: false,
+			sentenceList: [],
 			userInput: ""
 		};
 		_this.handleChange = _this.handleChange.bind(_this);
@@ -46,7 +47,11 @@ var SearchApp = function (_React$Component) {
 			}).then(function (data) {
 				console.log("Successfully obtained sentences: ", data);
 				_this2.sentences = data;
-				_this2.setState({ sentencesHaveLoaded: true });
+				_this2.setState({
+					sentencesLoaded: true,
+					sentenceList: _this2.sentences
+
+				});
 			}).catch(function (error) {
 				console.log(error);
 			});
@@ -61,6 +66,8 @@ var SearchApp = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
+			console.log('render sentences', this.sentences);
+			console.log('render display', this.state.sentenceList);
 			return React.createElement(
 				'div',
 				{ className: 'search-app' },
@@ -74,7 +81,14 @@ var SearchApp = function (_React$Component) {
 						placeholder: "Type your keyword here...",
 						onChange: this.handleChange
 					})
-				)
+				),
+				this.state.sentenceList.map(function (sentence) {
+					return React.createElement(
+						'div',
+						{ key: sentence.id, className: 'sentence-block' },
+						sentence.data
+					);
+				})
 			);
 		}
 	}]);
